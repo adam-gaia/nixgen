@@ -12,13 +12,18 @@ use jiff::{Zoned, Unit};
 use std::env;
 use clap::{Parser, Args, Subcommand, ValueEnum};
 use nixgen::NixGen;
+use nixgen::label;
 
 #[derive(Debug, Subcommand)]
 enum Commands {
 	/// List all NixOS generations
 	List,
+
 	/// Show the current NixOS generation
 	Current,
+
+	/// Generate a label for a generation
+	Label,
 }
 
 #[derive(Debug, Parser)]
@@ -59,7 +64,11 @@ fn main() -> Result<()> {
 				},
 				Commands::Current => {
 					current(&nixgen)?;
-				}		
+				},
+				Commands::Label => {
+				    let label = label()?;	
+				    println!("{}", label);
+				},
 			}
 		},
 		None => {

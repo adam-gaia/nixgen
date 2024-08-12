@@ -11,6 +11,10 @@ use log::debug;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
+mod label;
+pub use label::label;
+
+
 const DEFAULT_PROFILE_DIR: &str = "/nix/var/nix/profiles";
 const DEFAULT_SYSTEM_PROFILE: &str = "system";
 
@@ -20,15 +24,18 @@ const DEFAULT_SYSTEM_PROFILE: &str = "system";
 struct Bootspec {
     init: PathBuf,
     initrd: Option<PathBuf>,
-    initSecrets: Option<PathBuf>,
+    #[serde(rename = "initSecrets")]
+    init_secrets: Option<PathBuf>,
     kernel: PathBuf,
-    kernelParams: Vec<String>, // TODO: maybe create custom type with custom ser/de to parse kernel command line options
+    #[serde(rename = "kernelParams")]
+    kernel_params: Vec<String>, // TODO: maybe create custom type with custom ser/de to parse kernel command line options
     label: String,
     system: String,
     #[serde(rename = "topLevel")]
     top_level: Option<PathBuf>, // RFC says this is required, but its not there in my current system generation
 }
 
+/// Nixos Generation boot.json
 #[derive(Serialize, Deserialize)]
 pub struct Generation {
     #[serde(rename = "org.nixos.bootspec.v1")]
@@ -99,8 +106,8 @@ impl NixGen {
         for entry in entries {
             let entry = entry?;
             let name = entry.file_name();
-            static re: Lazy<Regex> = Lazy::new(|| Regex::new(r"system-([0-9]+)-link").unwrap());
-            let Some(capture_groups) = re.captures(name.to_str().unwrap()) else {
+            static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"system-([0-9]+)-link").unwrap());
+            let Some(capture_groups) = RE.captures(name.to_str().unwrap()) else {
                 continue;
             };
             let Some(index_match) = capture_groups.get(1) else {
