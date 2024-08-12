@@ -1,6 +1,6 @@
 [package]
 name = "nixgen"
-version = "0.1.0"
+version = "0.1.1"
 description = "View/manage and managing NixOS generations"
 edition = "2021"
 readme = "README.md"
