@@ -71,9 +71,26 @@ fn timestamp() -> Result<String> {
     Ok(timestamp)
 }
 
-pub fn label() -> Result<String> {
+#[derive(Debug)]
+pub enum RepoRootConfig {
+    Discover,
+    Path(PathBuf)
+}
+impl RepoRootConfig {
+    pub fn from_option(x: Option<PathBuf>) -> Self {
+        match x {
+            Some(p) => RepoRootConfig::Path(p),
+            None => RepoRootConfig::Discover,
+        }
+    }
+}
+
+pub fn label(repo_path: RepoRootConfig) -> Result<String> {
     let name = name()?;
-    let repo_root = find_repo_root()?;
+    let repo_root = match repo_path {
+        RepoRootConfig::Discover => find_repo_root()?,
+        RepoRootConfig::Path(p) => p,
+    };
     let git_status = git_status(&repo_root)?; 
     let timestamp = timestamp()?;
     let label = format!("{}-{}-{}", name, timestamp, git_status);

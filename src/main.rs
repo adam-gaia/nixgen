@@ -13,6 +13,7 @@ use std::env;
 use clap::{Parser, Args, Subcommand, ValueEnum};
 use nixgen::NixGen;
 use nixgen::label;
+use nixgen::RepoRootConfig;
 
 #[derive(Debug, Subcommand)]
 enum Commands {
@@ -23,7 +24,9 @@ enum Commands {
 	Current,
 
 	/// Generate a label for a generation
-	Label,
+	Label {
+		repo_root: Option<PathBuf>
+	},
 }
 
 #[derive(Debug, Parser)]
@@ -65,8 +68,9 @@ fn main() -> Result<()> {
 				Commands::Current => {
 					current(&nixgen)?;
 				},
-				Commands::Label => {
-				    let label = label()?;	
+				Commands::Label {repo_root}=> {
+					let config = RepoRootConfig::from_option(repo_root);
+				    let label = label(config)?;	
 				    println!("{}", label);
 				},
 			}

@@ -13,6 +13,7 @@ use regex::Regex;
 
 mod label;
 pub use label::label;
+pub use label::RepoRootConfig;
 
 
 const DEFAULT_PROFILE_DIR: &str = "/nix/var/nix/profiles";
